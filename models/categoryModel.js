@@ -1,25 +1,30 @@
 module.exports = (sequelize, DataTypes, Model) => {
-  class Bookmark extends Model {}
-  Bookmark.init(
+  class Category extends Model {}
+  Category.init(
     {
       // Model attributes are defined here
-      user_id: {
+      id: {
         type: DataTypes.INTEGER,
+        autoIncrement: true,
         primaryKey: true,
-        allowNull: false,
       },
-      coffee_id: {
+      name: {
+        type: DataTypes.STRING(255),
+        allowNull: false,
+        unique: true,
+      },
+      icon_id: {
         type: DataTypes.INTEGER,
-        primaryKey: true,
         allowNull: false,
       },
     },
     {
       // Other model options go here
       sequelize, // We need to pass the connection instance
-      modelName: "Bookmark", // We need to choose the model name
-      timestamps: true,
+      modelName: "Category", // We need to choose the model name
+      timestamps: false,
+      tableName: "categories"
     }
   );
-  return Bookmark;
+  return Category;
 };

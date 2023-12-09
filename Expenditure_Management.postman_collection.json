@@ -1,0 +1,164 @@
+{
+	"info": {
+		"_postman_id": "4fe0a765-9c45-4086-a96d-be297e15e402",
+		"name": "Expenditure_Management",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21065467"
+	},
+	"item": [
+		{
+			"name": "Create New Spending",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "money",
+							"value": "20000",
+							"type": "text"
+						},
+						{
+							"key": "note",
+							"value": "Bánh mì",
+							"type": "text"
+						},
+						{
+							"key": "date",
+							"value": "2023/12/07",
+							"type": "text"
+						},
+						{
+							"key": "categoryId",
+							"value": "1",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:3001/spendings",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"spendings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Spendings",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3001/spendings",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"spendings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Categories",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3001/categories",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"categories"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create New Limit For Category",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "limitMoney",
+							"value": "150000",
+							"type": "text"
+						},
+						{
+							"key": "date",
+							"value": "2023-11-23",
+							"type": "text"
+						},
+						{
+							"key": "categoryId",
+							"value": "10",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:3001/limits",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"limits"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Limit For Cateogory",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3001/limits",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"limits"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Icon Images",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3001/icons/food.png",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"icons",
+						"food.png"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

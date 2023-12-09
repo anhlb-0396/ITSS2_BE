@@ -30,19 +30,12 @@ module.exports = (sequelize, DataTypes, Model) => {
         defaultValue: "user",
         allowNull: false,
       },
-      avatar: {
-        type: DataTypes.STRING(255),
-      },
-      nationality: {
-        type: DataTypes.STRING(255),
-        allowNull: false, // japanese or vietnamese or american
-      },
     },
     {
-      // Other model options go here
-      sequelize, // We need to pass the connection instance
-      modelName: "User", // We need to choose the model name
+      sequelize,
+      modelName: "User",
       timestamps: false,
+      tableName: "users"
     }
   );
   return User;

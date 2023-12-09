@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes, Model) => {
-  class Review extends Model {}
-  Review.init(
+  class Spending extends Model {}
+  Spending.init(
     {
       // Model attributes are defined here
       id: {
@@ -8,29 +8,33 @@ module.exports = (sequelize, DataTypes, Model) => {
         autoIncrement: true,
         primaryKey: true,
       },
-      user_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      coffee_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      review: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      rating: {
+      money: {
         type: DataTypes.FLOAT,
+        allowNull: false,
+      },
+      note: {
+        type: DataTypes.STRING(100),
+      },
+      date: {
+        type: DataTypes.DATEONLY,
+        allowNull: false,
+      },
+      is_deleted: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+      category_id: {
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
     },
     {
       // Other model options go here
       sequelize, // We need to pass the connection instance
-      modelName: "Review", // We need to choose the model name
+      modelName: "Spending", // We need to choose the model name
+      tableName: "spendings",
       timestamps: true,
     }
   );
-  return Review;
+  return Spending;
 };
