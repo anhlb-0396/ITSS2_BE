@@ -1,8 +1,8 @@
 const { Sequelize, DataTypes, Model, QueryTypes, Op } = require("sequelize");
-const sequelize = new Sequelize("personal_expenditure_management", "root", "Lebaoanh194470@", {
-  host: "localhost",
+const sequelize = new Sequelize("itss", "root", "F44a5EC5d2BEEAGcD2DfHd4eaBgBfdFB", {
+  host: "roundhouse.proxy.rlwy.net",
   dialect: "mysql",
-  port: 3306,
+  port: 23742,
 });
 
 // Connecting to MySQL Database

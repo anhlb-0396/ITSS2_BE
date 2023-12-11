@@ -3,6 +3,10 @@ const { LimitCategory, Category, Icon, sequelize, QueryTypes } = require("../mod
 exports.getAllLimitCategories = async (req, res) => {
     try {
       const limitCategories = await LimitCategory.findAll({
+        attributes:[
+          "id", "limit_money", "category_id",
+          [sequelize.fn("CONCAT", sequelize.fn("YEAR", sequelize.col("date")),"-",sequelize.fn("MONTH", sequelize.col("date"))), "date"],
+        ],
         include: {
             model: Category,
             include: Icon
