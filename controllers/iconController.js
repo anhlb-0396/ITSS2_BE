@@ -35,7 +35,7 @@ exports.createIcon = async (req, res) => {
     } catch (error) {
       return res.status(400).json({
         status: "fail",
-        message: error?.errors[0]?.message,
+        message: error,
       });
     }
   };
