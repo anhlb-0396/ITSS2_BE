@@ -81,11 +81,41 @@ exports.getAllSpendingsStatistic = async (req,res) =>{
         group: [Sequelize.fn('MONTH', Sequelize.col('date'))],
       });
 
+      // console.log(spendings);
+
+
+      for(let i=0;i<spendings.length;i++){
+        const categoriesSpendingsInMonth = await Spending.findAll({
+          attributes: [
+            "category_id",
+            [Sequelize.fn('SUM', Sequelize.col('money')), 'totalSpendings']
+          ],
+          include:{
+            model: Category,
+          },
+          where: {
+            [Sequelize.Op.and]: [
+              Sequelize.where(
+                Sequelize.fn('MONTH', Sequelize.col('date')),
+                spendings[i].dataValues.month
+              ),
+              Sequelize.where(
+                Sequelize.fn('YEAR', Sequelize.col('date')),
+                year
+              ),
+            ],
+          },
+          group: ["category_id"]
+        });
+        // console.log(categoriesSpendingsInMonth);
+        spendings[i].dataValues.categories = categoriesSpendingsInMonth
+      }
+
       return res.status(200).json({
         status: "success",
         data: {
           year,
-          resultArray :spendings
+          resultArray :spendings,
         },
       });
     }
@@ -112,56 +142,75 @@ exports.getAllSpendingsStatistic = async (req,res) =>{
       order: [['date','asc']]
     });
 
-    const allDetailSpendings = await Spending.findAll({
-      include: {
-          model: Category,
-          include: Icon
-      },
-      where: {
-        [Sequelize.Op.and]: [
-          Sequelize.where(
-            Sequelize.fn('MONTH', Sequelize.col('date')),
-            month
-          ),
-          Sequelize.where(
-            Sequelize.fn('YEAR', Sequelize.col('date')),
-            year
-          ),
-        ],
-      },
-      order: [['date','desc']]
-    });
-
-    // Group spendings by date
-    const groupedSpendings = allDetailSpendings.reduce((result, spending) => {
-      const date = spending.date;
-      if (!result[date]) result[date] = [];
-      result[date].push(spending);
-      return result;
-    }, {});
-
-    // Convert the grouped spendings into an array
-    const resultArray = Object.keys(groupedSpendings).map((date) => ({
-      date,
-      spendings: groupedSpendings[date],
-    }));
-
     console.log(spendings);
 
-    resultArray.forEach((dayOfDetail)=>{
-      spendings.forEach(day=>{
-        if(dayOfDetail.date === day.dataValues.date){
-          dayOfDetail.totalSpendings = day.dataValues.totalAmount
-        }
-      })
-    })
+    for (let i = 0; i < spendings.length; i++) {
+      const categoriesSpendingsInDay = await Spending.findAll({
+        attributes: [
+          "category_id",
+          [Sequelize.fn('SUM', Sequelize.col('money')), 'totalSpendings']
+        ],
+        include:{
+          model: Category,
+        },
+        where: {
+          date: spendings[i].dataValues.date
+        },
+        group: ["category_id"]
+      });
+      spendings[i].dataValues.categories = categoriesSpendingsInDay
+    }
+
+    // const allDetailSpendings = await Spending.findAll({
+    //   include: {
+    //       model: Category,
+    //       include: Icon
+    //   },
+    //   where: {
+    //     [Sequelize.Op.and]: [
+    //       Sequelize.where(
+    //         Sequelize.fn('MONTH', Sequelize.col('date')),
+    //         month
+    //       ),
+    //       Sequelize.where(
+    //         Sequelize.fn('YEAR', Sequelize.col('date')),
+    //         year
+    //       ),
+    //     ],
+    //   },
+    //   order: [['date','desc']]
+    // });
+
+    // // Group spendings by date
+    // const groupedSpendings = allDetailSpendings.reduce((result, spending) => {
+    //   const date = spending.date;
+    //   if (!result[date]) result[date] = [];
+    //   result[date].push(spending);
+    //   return result;
+    // }, {});
+
+    // // Convert the grouped spendings into an array
+    // const resultArray = Object.keys(groupedSpendings).map((date) => ({
+    //   date,
+    //   spendings: groupedSpendings[date],
+    // }));
+
+    // console.log(spendings);
+
+    // resultArray.forEach((dayOfDetail)=>{
+    //   spendings.forEach(day=>{
+    //     if(dayOfDetail.date === day.dataValues.date){
+    //       dayOfDetail.totalSpendings = day.dataValues.totalAmount
+    //     }
+    //   })
+    // })
 
     return res.status(200).json({
       status: "success",
       data: {
         month,
         year,
-        resultArray
+        spendings
       },
     });
   } catch (error) {
