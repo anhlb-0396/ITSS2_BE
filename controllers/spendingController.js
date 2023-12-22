@@ -1,4 +1,4 @@
-const { Spending, Category,Icon, sequelize, QueryTypes, Sequelize, Op } = require("../models/index");
+const { Spending, Category, Icon, LimitCategory, sequelize, QueryTypes, Sequelize, Op } = require("../models/index");
 
 exports.getAllSpendings = async (req, res) => {
     try {
@@ -211,6 +211,94 @@ exports.getAllSpendingsStatistic = async (req,res) =>{
         month,
         year,
         spendings
+      },
+    });
+  } catch (error) {
+    return res.status(400).json({
+      status: "fail",
+      message: error.message,
+    });
+  }
+}
+
+exports.getRatiosBetweenSpendingsAndLimits = async (req,res)=>{
+  try {
+    // 1.Get The Current MONTH & YEAR 
+    const {month, year} =req.query;
+
+    // 2.Get Total Spendings By Each Categories 
+    const allSpendingsInMonth = await Spending.findAll({
+      attributes: ['category_id', [Sequelize.fn('SUM', Sequelize.col('money')), 'totalMoney']],
+      where: {
+        [Sequelize.Op.and]: [
+          Sequelize.where(
+            Sequelize.fn('MONTH', Sequelize.col('date')),
+            month
+          ),
+          Sequelize.where(
+            Sequelize.fn('YEAR', Sequelize.col('date')),
+            year
+          ),
+        ],
+      },
+        group: ['category_id'],
+    });
+
+    // 3.Get Total Spendings Limit By Each Categories
+    const limitCategories = await LimitCategory.findAll({
+      where: {
+        [Sequelize.Op.and]: [
+          Sequelize.where(
+            Sequelize.fn('MONTH', Sequelize.col('date')),
+            month
+          ),
+          Sequelize.where(
+            Sequelize.fn('YEAR', Sequelize.col('date')),
+            year
+          ),
+        ],
+      },
+      include:{model: Category, include: Icon},
+      order: [['category_id','asc']],
+    });
+
+    const simplifiedLimitCategories = limitCategories.map((limitCategory) => ({
+      category_id: limitCategory.category_id,
+      limit_money: limitCategory.limit_money,
+      name: limitCategory.Category.name,
+      icon: {
+        id: limitCategory.Category.Icon.id,
+        content: limitCategory.Category.Icon.content,
+        name: limitCategory.Category.Icon.name,
+      },
+    }));
+
+    // 4.Devide and get the ratios between them
+    // console.log(allSpendingsInMonth);
+    const ratioSpendingsInMonth = simplifiedLimitCategories.map((simplifiedLimitCategory)=>{
+      let totalUsedMoney = 0 ;
+      let percentage = 0 ;
+      const firstMatchedSpendingCategory = allSpendingsInMonth.find((category) => category.dataValues.category_id == simplifiedLimitCategory.category_id)
+      if (firstMatchedSpendingCategory) {
+        totalUsedMoney = firstMatchedSpendingCategory.dataValues.totalMoney;
+        percentage = Math.round((totalUsedMoney / simplifiedLimitCategory.limit_money)*100);
+      }
+      return {
+        ...simplifiedLimitCategory,
+        totalUsedMoney,
+        percentage
+      }
+    })
+
+    // console.log(allSpendingsInMonth,simplifiedLimitCategories);
+    
+    // 5.Return array of ratio by categories limit to the client
+    return res.status(200).json({
+      status: "success",
+      data: {
+        month,
+        year,
+        ratioSpendingsInMonth
       },
     });
   } catch (error) {
