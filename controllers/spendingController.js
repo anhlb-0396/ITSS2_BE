@@ -42,6 +42,32 @@ exports.getAllSpendings = async (req, res) => {
 exports.createSpending = async (req, res) => {
     try {
       const {money, note, date, categoryId} = req.body
+      const month = new Date(date).getMonth();
+      const year = new Date(date).getFullYear();
+
+      // console.log(month,year);
+
+      const categoryInMonth = await LimitCategory.findAll({
+        where:{
+          category_id: categoryId,
+          [Sequelize.Op.and]: [
+            Sequelize.where(
+              Sequelize.fn('MONTH', Sequelize.col('date')), month + 1
+            ),
+            Sequelize.where(
+              Sequelize.fn('YEAR', Sequelize.col('date')), year
+            ),
+          ],
+        }
+      });
+
+      if (categoryInMonth.length == 0) {
+        return res.status(301).json({
+          status: "redirect",
+          message: "Not setting up the limits for this category in this current month",
+        });
+      }
+      
       const newSpending = await Spending.create({
         money, note, date: new Date(date), category_id: categoryId
       })
