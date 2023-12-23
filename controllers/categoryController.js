@@ -3,7 +3,7 @@ const { Category, Icon, sequelize, QueryTypes } = require("../models/index");
 exports.getAllCategories = async (req, res) => {
   try {
     const categories = await Category.findAll({
-      include: Icon
+      include: Icon,
     });
 
     return res.status(200).json({

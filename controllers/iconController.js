@@ -20,22 +20,23 @@ exports.getAllIcons = async (req, res) => {
 };
 
 exports.createIcon = async (req, res) => {
-    try {
-      const {content, name } = req.body;
-      const newIcon = await Icon.create({
-        content, name
-      })
-      
-      return res.status(201).json({
-        status: "success",
-        data: {
-          icon: newIcon,
-        },
-      });
-    } catch (error) {
-      return res.status(400).json({
-        status: "fail",
-        message: error,
-      });
-    }
-  };
+  try {
+    const { content, name } = req.body;
+    const newIcon = await Icon.create({
+      content,
+      name,
+    });
+
+    return res.status(201).json({
+      status: "success",
+      data: {
+        icon: newIcon,
+      },
+    });
+  } catch (error) {
+    return res.status(400).json({
+      status: "fail",
+      message: error,
+    });
+  }
+};
