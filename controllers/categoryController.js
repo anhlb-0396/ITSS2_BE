@@ -20,3 +20,39 @@ exports.getAllCategories = async (req, res) => {
     });
   }
 };
+
+exports.createCategory = async (req, res) => {
+  try {
+    const { iconName, categoryName } = req.body;
+
+    const icon = await Icon.findOne({
+      where: {
+        name: iconName,
+      },
+    });
+
+    if (!icon) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Cannot find the icon in the list",
+      });
+    }
+
+    const newCategory = await Category.create({
+      name: categoryName,
+      icon_id: icon.dataValues.id,
+    });
+
+    return res.status(201).json({
+      status: "success",
+      data: {
+        newCategory,
+      },
+    });
+  } catch (error) {
+    return res.status(400).json({
+      status: "fail",
+      message: error,
+    });
+  }
+};
