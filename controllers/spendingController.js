@@ -72,8 +72,7 @@ exports.createSpending = async (req, res) => {
     if (categoryInMonth.length == 0) {
       return res.status(301).json({
         status: "redirect",
-        message:
-          "Not setting up the limits for this category in this current month",
+        message: `Bạn chưa đặt hạn mức chi tiêu trong tháng này! Vui lòng thiết lập hạn mức!`,
       });
     }
 
@@ -193,11 +192,31 @@ exports.getAllSpendingsStatistic = async (req, res) => {
         spendings[i].dataValues.categories = categoriesSpendingsInMonth;
       }
 
+      const months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+
+      const handledSpendings = months.map((month) => {
+        let returnObj = null;
+        for (let i = 0; i < spendings.length; i++) {
+          if (month == spendings[i].dataValues.month) {
+            returnObj = spendings[i].dataValues;
+            break;
+          }
+        }
+        if (returnObj == null) {
+          returnObj = {
+            month,
+            totalSpendings: 0,
+            categories: [],
+          };
+        }
+        return returnObj;
+      });
+
       return res.status(200).json({
         status: "success",
         data: {
           year,
-          resultArray: spendings,
+          resultArray: handledSpendings,
         },
       });
     }
