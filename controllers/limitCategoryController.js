@@ -7,6 +7,46 @@ const {
   Sequelize,
 } = require("../models/index");
 
+const _ = require("lodash");
+
+// exports.getAllLimitCategories = async (req, res) => {
+//   try {
+//     const limitCategories = await LimitCategory.findAll({
+//       attributes: [
+//         "id",
+//         "limit_money",
+//         "category_id",
+//         [
+//           sequelize.fn(
+//             "CONCAT",
+//             sequelize.fn("MONTH", sequelize.col("date")),
+//             "/",
+//             sequelize.fn("YEAR", sequelize.col("date"))
+//           ),
+//           "date",
+//         ],
+//       ],
+//       include: {
+//         model: Category,
+//         include: Icon,
+//       },
+//     });
+
+//     return res.status(200).json({
+//       status: "success",
+//       results: limitCategories.length,
+//       data: {
+//         limitCategories,
+//       },
+//     });
+//   } catch (error) {
+//     return res.status(404).json({
+//       status: "fail",
+//       message: error,
+//     });
+//   }
+// };
+
 exports.getAllLimitCategories = async (req, res) => {
   try {
     const limitCategories = await LimitCategory.findAll({
@@ -30,11 +70,29 @@ exports.getAllLimitCategories = async (req, res) => {
       },
     });
 
+    // Group data by date (month, year)
+    const groupedData = _.groupBy(limitCategories, "date");
+
+    // Transform grouped data for response
+    const transformedData = Object.keys(groupedData).map((date) => {
+      const categories = groupedData[date].map((item) => ({
+        id: item.id,
+        limit_money: item.limit_money,
+        category_id: item.category_id,
+        Category: item.Category,
+      }));
+
+      return {
+        date,
+        categories,
+      };
+    });
+
     return res.status(200).json({
       status: "success",
-      results: limitCategories.length,
+      results: transformedData.length,
       data: {
-        limitCategories,
+        limitCategories: transformedData,
       },
     });
   } catch (error) {
