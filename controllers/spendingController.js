@@ -9,6 +9,14 @@ const {
   Op,
 } = require("../models/index");
 
+const { getDaysInMonth } = require("date-fns");
+
+const getNumberOfDaysInMonth = (year, month) => {
+  // JavaScript months are 0-based, so subtract 1 from the month
+  const numberOfDays = getDaysInMonth(new Date(year, month - 1));
+  return numberOfDays;
+};
+
 exports.getAllSpendings = async (req, res) => {
   try {
     const spendings = await Spending.findAll({
@@ -237,8 +245,6 @@ exports.getAllSpendingsStatistic = async (req, res) => {
       order: [["date", "asc"]],
     });
 
-    console.log(spendings);
-
     for (let i = 0; i < spendings.length; i++) {
       const categoriesSpendingsInDay = await Spending.findAll({
         attributes: [
@@ -256,12 +262,37 @@ exports.getAllSpendingsStatistic = async (req, res) => {
       spendings[i].dataValues.categories = categoriesSpendingsInDay;
     }
 
+    const numberOfDaysInMonth = getNumberOfDaysInMonth(year, month);
+    const dateArray = [];
+    for (let i = 1; i <= numberOfDaysInMonth; i++) {
+      const date = `${year}-${month}-${i < 10 ? `0${i}` : i}`;
+      dateArray.push(date);
+    }
+
+    const finalSpendings = dateArray.map((date) => {
+      let returnObj = null;
+      for (let i = 0; i < spendings.length; i++) {
+        if (date == spendings[i].dataValues.date) {
+          returnObj = spendings[i].dataValues;
+          break;
+        }
+      }
+      if (returnObj == null) {
+        returnObj = {
+          date,
+          totalAmount: 0,
+          categories: [],
+        };
+      }
+      return returnObj;
+    });
+
     return res.status(200).json({
       status: "success",
       data: {
         month,
         year,
-        spendings,
+        spendings: finalSpendings,
       },
     });
   } catch (error) {
