@@ -1,9 +1,14 @@
 const { Sequelize, DataTypes, Model, QueryTypes, Op } = require("sequelize");
-const sequelize = new Sequelize("itss", "root", "F44a5EC5d2BEEAGcD2DfHd4eaBgBfdFB", {
-  host: "roundhouse.proxy.rlwy.net",
-  dialect: "mysql",
-  port: 23742,
-});
+const sequelize = new Sequelize(
+  "itss",
+  "root",
+  "4Dg1HAG4G4-HFBHEg43eE-HG6Eh1eEcC",
+  {
+    host: "roundhouse.proxy.rlwy.net",
+    dialect: "mysql",
+    port: 11511,
+  }
+);
 
 // Connecting to MySQL Database
 const connectDB = async () => {
@@ -17,7 +22,7 @@ const connectDB = async () => {
 
 connectDB();
 
-const db = {Sequelize, sequelize, QueryTypes, Op};
+const db = { Sequelize, sequelize, QueryTypes, Op };
 
 // Include Models
 db.User = require("./userModel")(sequelize, DataTypes, Model);
